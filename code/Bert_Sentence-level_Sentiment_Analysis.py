@@ -70,7 +70,9 @@ test_loader = DataLoader(dataset=test_set, batch_size=1, shuffle=True)
 class netWork(nn.Module):
     def __init__(self):
         super().__init__()
-        self.model = BertModel.from_pretrained(model_name, cache_dir='./')
+        self.model = BertModel.from_pretrained("./bert-base-chinese")
+        for param in self.model.parameters():
+            param.requires_grad = True
         self.dropout = nn.Dropout(0.1)
         self.l = nn.Linear(768, 2)
 
@@ -117,7 +119,7 @@ for i in range(epoch):
             optimizer.zero_grad()
         
         if ((batch_idx+1) % accumulation_steps) == 1:
-            print(f"Train Epoch:{i+1}\tLoss:{loss.item()}")
+            print(f"Train Epoch:{i+1}\tIteration:{batch_idx*4}/{TRAINSET_SIZE}\tLoss:{loss.item()}")
         
         if batch_idx == len(train_loader)-1:
             print("labels:",target)
@@ -140,8 +142,4 @@ for batch_idx, (data, target) in enumerate(test_loader):
     correct += (pred == target).sum().item()
     total += len(data)
 
-print(f"Corret：{correct}, Total：{total}, Accuracy：{(100.0*correct)/total}")
-
-
-
-
+print(f"Corret：{correct}, Total：{total}, Accuracy：{(100.0*correct)/total}%")
